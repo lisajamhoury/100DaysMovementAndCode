@@ -1,0 +1,311 @@
+<!-- based on https://threejs.org/examples/#webgl_multiple_elements_text -->
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - multiple elements with text</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			* {
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+			}
+
+			body {
+				color: #000;
+				font-family: Monospace;
+				font-size: 13px;
+
+				background-color: #fff;
+				margin: auto;
+				padding: .5in;
+				max-width: 7in;
+				text-align: justify;
+			}
+
+			.view {
+				width: 5in;
+				height: 5in;
+				margin: auto;
+			}
+
+			#c {
+				position: fixed;
+				left: 0px; top: 0px;
+				width: 100%;
+				height: 100%;
+				background-color: #fff;
+				z-index: -1;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 6.5in;
+				padding: 0px;
+				text-align: center;
+			}
+
+			a {
+				color: #0080ff;
+			}
+
+			.math {
+
+				text-align: center;
+
+			}
+
+			.math-frac {
+
+				display: inline-block;
+				vertical-align: middle;
+
+			}
+
+			.math-num {
+
+				display: block;
+
+			}
+
+			.math-denom {
+
+				display: block;
+				border-top: 1px solid;
+
+			}
+
+			.math-sqrt {
+
+				display: inline-block;
+				transform: scale(1, 1.3);
+
+			}
+
+			.math-sqrt-stem {
+
+				display: inline-block;
+				border-top: 1px solid;
+				margin-top: 5px;
+
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<canvas id="c"></canvas>
+
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple elements with text - webgl</div>
+
+		<script src="../shared/js/threejs/three.min.js"></script>
+		<script src="../shared/js/controls/OrbitControls.js"></script>
+		<script src="../shared/js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var scenes = [], views, t, canvas, renderer;
+			var lastBurst = 0;
+
+			window.onload = init;
+
+			function init() {
+
+				var balls = 20;
+				var size = .05;
+
+				var colors = [ 'rgb(255,255,255)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(0,255,255)',
+        				       'rgb(255,0,255)', 'rgb(255,0,127)', 'rgb(255,255,0)', 'rgb(0,255,127)' ];
+
+				canvas = document.getElementById( 'c' );
+
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+				renderer.setClearColor( 0xffffff, 1 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+
+				views = document.querySelectorAll( '.view' );
+
+				for ( var n = 0 ; n < views.length ; n++ ) {
+
+					var scene = new THREE.Scene();
+
+					var geometry = new THREE.Geometry();
+					var geometry0 = new THREE.Geometry();
+
+					if ( views[n].lattice ) {
+
+						var range = balls / 2;
+						for ( var i = -range ; i <= range ; i++ ) {
+
+							for ( var j = -range ; j <= range ; j++ ) {
+
+								for ( var k = -range ; k <= range ; k++ ) {
+
+									geometry.vertices.push( new THREE.Vector3( i, j, k ) );
+									geometry0.vertices.push( new THREE.Vector3( i, j, k ) );
+
+								}
+
+							}
+
+						}
+
+					} else {
+
+						for ( var m = 0 ; m < Math.pow( balls, 3 ) ; m++ ) {
+
+							var i = balls * Math.random() - balls / 2;
+							var j = balls * Math.random() - balls / 2;
+							var k = balls * Math.random() - balls / 2;
+
+							geometry.vertices.push( new THREE.Vector3( i, j, k ) );
+							geometry0.vertices.push( new THREE.Vector3( i, j, k ) );
+
+						}
+
+					}
+
+					var index = Math.floor( colors.length * Math.random() );
+
+					var canvas2 = document.createElement( 'canvas' );
+					canvas2.width = 128;
+					canvas2.height = 128;
+					var context = canvas2.getContext( '2d' );
+					context.arc( 64, 64, 64, 0, 2 * Math.PI );
+					context.fillStyle = colors[ 0 ];
+					context.fill();
+					var texture = new THREE.Texture( canvas2 );
+					texture.needsUpdate = true;
+
+					var material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: .1 } );
+
+					scene.add( new THREE.Points( geometry, material ) );
+
+					scene.userData.view = views[n];
+					scene.userData.geometry0 = geometry0;
+
+					var camera = new THREE.PerspectiveCamera( 75, 1, .1, 100 );
+					camera.position.set( 0, 0, 1.2*balls );
+					scene.userData.camera = camera;
+
+					var controls = new THREE.OrbitControls( camera, views[n] );
+					scene.userData.controls = controls;
+
+					scenes.push( scene );
+
+				}
+
+				t = 0;
+				animate();
+
+			}
+
+			function updateSize() {
+
+				var width = canvas.clientWidth;
+				var height = canvas.clientHeight;
+
+				if ( canvas.width !== width || canvas.height != height ) {
+
+					renderer.setSize( width, height, false );
+
+				}
+
+			}
+
+			function animate() {
+
+				render();
+				requestAnimationFrame( animate );
+
+			}
+
+			function render() {
+
+				updateSize();
+
+				renderer.setClearColor( 0xffffff );
+				renderer.setScissorTest( false );
+				renderer.clear();
+
+				renderer.setClearColor( 0x000000 );
+				renderer.setScissorTest( true );
+
+				scenes.forEach( function( scene ) {
+
+					var rect = scene.userData.view.getBoundingClientRect();
+					// check if it's offscreen. If so skip it
+					if ( rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
+						 rect.right  < 0 || rect.left > renderer.domElement.clientWidth ) {
+						return;  // it's off screen
+					}
+					// set the viewport
+					var width  = rect.right - rect.left;
+					var height = rect.bottom - rect.top;
+					var left   = rect.left;
+					var bottom = renderer.domElement.clientHeight - rect.bottom;
+					renderer.setViewport( left, bottom, width, height );
+					renderer.setScissor( left, bottom, width, height );
+
+					renderer.render( scene, scene.userData.camera );
+					scene.userData.controls.update();
+
+					for ( var i = 0 ; i < scene.children[0].geometry.vertices.length ; i++ ) {
+
+						var v0 = scene.userData.geometry0.vertices[i];
+						var v = scene.userData.view.displacement( v0.x, v0.y, v0.z, t/50 );
+						scene.children[0].geometry.vertices[i].set( v.x + v0.x, v.y + v0.y, v.z + v0.z );
+
+					}
+
+					scene.children[0].geometry.verticesNeedUpdate = true;
+
+				} );
+
+				t ++;
+
+			}
+
+		</script>
+
+
+<!-- KEEP THIS  -->
+		<div class="view">
+
+		<script>
+
+			var parent = document.scripts[ document.scripts.length - 1 ].parentNode;
+
+			parent.displacement = function( x, y, z, t ) {
+			//console.log(start);
+				if ( (x * x + y * y < .001) ) {
+				//	console.log('inside', start);
+					return new THREE.Vector3( 0, 0, 0);
+				} else {
+				
+				//} else if (lastBurst > (Date.now() + 5000)) {
+					lastBurst = Date.now();
+					var rho = Math.sqrt( x * x + y * y )*0.1;
+					var phi = Math.atan2( y, x );
+
+					return new THREE.Vector3( 2 * Math.cos( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 2 * Math.sin( phi ) * Math.sin( rho - t ) / Math.sqrt( rho ), 15);
+
+				}
+
+			};
+
+			parent.lattice = false;
+
+		</script>
+
+		</div>
+<!-- KEEP TO HERE -->
+		
+
+
+
+	</body>
+</html>
