@@ -34,10 +34,6 @@ class Particle {
         y=height;
       }
     }
-    //if (x >= width) {
-    //  x = 0;  
-    //  y = 0;
-    //}
   }
 
   void display() {

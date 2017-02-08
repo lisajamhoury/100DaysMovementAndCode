@@ -1,27 +1,14 @@
-/*
- Curves II
- Ira Greenberg, December 4, 2005
- Updated January 7, 2014
- */
+/* Started with Curves II example from Ira Greenberg */
  
 ArrayList<Particle> particles;
- 
-//int particles = 25;
-//float[]x = new float[particles];
-//float[]y = new float[particles];
-//float[]xSpeed = new float[particles];
-//float[]ySpeed = new float[particles];
-//float[]accel = new float[particles];
 float gravity = .5;
 
 void setup(){
   size(400, 400);
   background(0);
-  strokeWeight(.1);
-  stroke(255,100);
   
   particles = new ArrayList<Particle>();
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10; i++) {
     Particle part = new Particle();
     particles.add(part);
   }
@@ -30,25 +17,29 @@ void setup(){
 }
 
 void draw() {
+  fill(0,10);
+  rect(0, 0, width, height);
   
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10; i++) {
     Particle part = new Particle();
     particles.add(part);
   }
   
-  //for (Particle part : particles) {
-  //  part.update();
-  //}
-  
+  strokeWeight(.5);
+  stroke(255,200);
   for (int i = particles.size()-1; i >= 0; i--) {
       Particle p = particles.get(i);
       p.update();
       if (p.isDead()) {
         particles.remove(i);
-        println("removing");
+        //println("removing");
       }
     }
-
   
+  //framerate   
+  //fill(0);
+  //rect (width/2,0, 200, 50);
+  //fill(255);
+  //text(frameRate, width/2, 20);
   
 }
