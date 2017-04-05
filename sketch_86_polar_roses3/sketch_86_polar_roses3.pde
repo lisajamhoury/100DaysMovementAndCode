@@ -4,16 +4,13 @@ float x, y;
 float angle; 
 float mult = 1;
 float inc = 10;
+float growth = 10;
 
 
 ArrayList<RoseBunch> bunches;
 
 RoseBunch roses1;
 RoseBunch roses2;
-RoseBunch roses3;
-RoseBunch roses4;
-RoseBunch roses5;
-RoseBunch roses6;
 
 void setup() {
   size(400, 400);
@@ -21,22 +18,12 @@ void setup() {
   fill(255);
   
   bunches = new ArrayList<RoseBunch>();
- 
-  //roses1 = new RoseBunch(0, height/2, mult/2, "pos" );
-  //roses2 = new RoseBunch(width, height/2, mult/2, "neg" );
   
   roses1 = new RoseBunch(0, height/2, mult*2, "pos" );
   roses2 = new RoseBunch(width, height/2, mult*2, "neg" );
   
-  
   bunches.add(roses1);
   bunches.add(roses2);
-  //bunches.add(roses3);
-  //bunches.add(roses4);
-
-//  roses5 = new RoseBunch(0, height/4, mult*2, "pos" );
-//  roses6 = new RoseBunch(width, height/4, mult/2, "neg" );
-
 }
 
 void draw() {
@@ -49,12 +36,12 @@ void draw() {
   for (int i = bunches.size()-1; i >= 0 ; i--) {
     bunches.get(i).run();
     if (bunches.get(i).isDead()) {
-      
+      println(inc);
       String dir = bunches.get(i).dir;
       //float startX = bunches.get(i).startPos.x;
       bunches.remove(i);
       if ( dir == "pos") {
-        inc++ ;
+        inc+=growth ;
         RoseBunch roses = new RoseBunch(0, height/2 + inc, mult*2, "pos");
         bunches.add(roses);
 

@@ -46,8 +46,8 @@ class Rose {
   }
   
   void display() {
-   strokeWeight(0.5);
-   stroke(0,50);   
+   strokeWeight(0.3);
+   stroke(0,30);   
    line(oldPos.x, oldPos.y, pos.x, pos.y);
   }  
 }

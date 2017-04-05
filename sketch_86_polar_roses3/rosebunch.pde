@@ -14,7 +14,7 @@ class RoseBunch {
     
     roses = new ArrayList<Rose>();
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       Rose rose = new Rose(startPos.x, startPos.y, multiplier, dir);
       roses.add(rose);
       multiplier += 0.01;
